@@ -4,23 +4,23 @@ import "fmt"
 
 type Route struct {
 	roots map[string]*node
-	handleFunMap map[string]handleFun
+	handleFunMap map[string]HandleFun
 }
 
 func NewRoute() *Route{
 	return &Route{
-		handleFunMap: make(map[string]handleFun),
+		handleFunMap: make(map[string]HandleFun),
 		roots: make(map[string]*node),
 	}
 }
 
-func (r *Route) AddGet(pattern string,handle handleFun)  {
+func (r *Route) AddGet(pattern string,handle HandleFun)  {
 	r.addMethod("GET",pattern,handle)
 }
-func (r *Route) AddPost(pattern string,handle handleFun)  {
+func (r *Route) AddPost(pattern string,handle HandleFun)  {
 	r.addMethod("POST",pattern,handle)
 }
-func (r *Route) addMethod(method string,pattern string,handle handleFun)  {
+func (r *Route) addMethod(method string,pattern string,handle HandleFun)  {
 	key:=method+"-"+pattern
 	r.handleFunMap[key]=handle
 	if r.roots[method]==nil{
@@ -47,8 +47,9 @@ func (r *Route) handleContext(ctx *Context) {
 	if route !=nil{
 		key:=ctx.Req.Method+"-"+route.Pattern
 		handfun:=r.handleFunMap[key]
-		fmt.Println("已经找到方法")
-		handfun(ctx)
+		ctx.handles=append(ctx.handles,handfun)
+		fmt.Println(ctx.handles)
+		ctx.DoAllNext()
 	}else{
 		ctx.String(404,"file %s not found\n",ctx.Req.URL.Path)
 	}

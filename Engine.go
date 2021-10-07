@@ -2,6 +2,7 @@ package MiniGin
 
 import (
 	"net/http"
+	"strings"
 )
 type Engine struct {
 	route *Route
@@ -9,7 +10,7 @@ type Engine struct {
 	Groups []*Group
 }
 
-type handleFun func(c *Context)
+type HandleFun func(c *Context)
 var defaultWeb *Engine
 
 func GetNewWeb()*Engine{
@@ -24,16 +25,20 @@ func GetNewWeb()*Engine{
 }
 func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	context:=GetContext(w,req)
-	//讲道理，下面的代码有点傻逼，
+	for _,group := range e.Groups{
+		if strings.HasPrefix(req.URL.Path, group.prefix) {
+			context.handles = append(context.handles, group.middles...)
+		}
+	}
 	e.route.handleContext(context)
 }
-func (e *Engine) AddGet(pattern string,handle handleFun)  {
+func (e *Engine) AddGet(pattern string,handle HandleFun)  {
 	e.route.AddGet(pattern,handle)
 }
-func (e *Engine) AddPost(pattern string,handle handleFun)  {
+func (e *Engine) AddPost(pattern string,handle HandleFun)  {
 	e.route.AddPost(pattern,handle)
 }
-func (e *Engine) addMethod(method string,pattern string,handle handleFun)  {
+func (e *Engine) addMethod(method string,pattern string,handle HandleFun)  {
 	e.route.addMethod(method,pattern,handle)
 }
 

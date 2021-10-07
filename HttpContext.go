@@ -9,12 +9,19 @@ type H map[string]interface{}
 type Context struct {
 	W http.ResponseWriter
 	Req *http.Request
+
+	index int  //context的当前执行函数
+
+	//handle里面的0:len是中间件函数，最后一个是注册的handle函数
+	handles []HandleFun
 }
 
 func GetContext(w http.ResponseWriter, req *http.Request) *Context {
 	return &Context{
 		W:   w,
 		Req: req,
+		index: -1,
+		handles: make([]HandleFun,0),
 	}
 }
 
@@ -27,6 +34,7 @@ func (c *Context) SetHeader(key,value string)  {
 func (c *Context) String(code int, format string, values ...interface{}) {
 	c.SetHeader("Content-Type", "text/plain")
 	c.SetStatus(code)
+	fmt.Println("这里好像出错了")
 	c.W.Write([]byte(fmt.Sprintf(format, values...)))
 }
 
@@ -48,6 +56,17 @@ func (c *Context) HTML(code int, html string) {
 	c.SetHeader("Content-Type", "text/html")
 	c.SetStatus(code)
 	c.W.Write([]byte(html))
+}
+
+/*=============================中间件==============================*/
+
+func (c *Context) DoAllNext()  {
+	c.index++
+	fmt.Println(c.index)
+	n:=len(c.handles)
+	for ;c.index<n;c.index++{
+		c.handles[c.index](c)
+	}
 }
 
 
