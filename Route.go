@@ -1,7 +1,5 @@
 package MiniGin
 
-import "fmt"
-
 type Route struct {
 	roots map[string]*node
 	handleFunMap map[string]HandleFun
@@ -48,7 +46,6 @@ func (r *Route) handleContext(ctx *Context) {
 		key:=ctx.Req.Method+"-"+route.Pattern
 		handfun:=r.handleFunMap[key]
 		ctx.handles=append(ctx.handles,handfun)
-		fmt.Println(ctx.handles)
 		ctx.DoAllNext()
 	}else{
 		ctx.String(404,"file %s not found\n",ctx.Req.URL.Path)
