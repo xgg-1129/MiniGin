@@ -13,10 +13,13 @@ type Engine struct {
 	templates *template.Template
 	funcMap   template.FuncMap
 
+	//下面是可选项，主要是实现一个文件来记录宕机的情况
+	//logMutex  sync.Mutex
+	//log        io.ReadWriteCloser
 }
 
 type HandleFun func(c *Context)
-var defaultWeb *Engine
+
 
 func GetNewWeb()*Engine{
 	engine:=&Engine{
@@ -26,6 +29,7 @@ func GetNewWeb()*Engine{
 		engine: engine,
 	}
 	engine.Groups=[]*Group{engine.Group}
+
 	return engine
 }
 func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -66,5 +70,8 @@ func (e *Engine) RegisterTemplate(fileSystem string)  {
 func (e *Engine) RegisterFunMap(funmap template.FuncMap)  {
 	e.funcMap=funmap
 }
+
+
+
 
 

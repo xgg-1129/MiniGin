@@ -52,8 +52,10 @@ func (c *Context) Data(code int, data []byte) {
 	c.SetStatus(code)
 	c.W.Write(data)
 }
-
-
+func (c *Context) Fail(code int,err string) {
+	c.SetStatus(code)
+	c.W.Write([]byte(err))
+}
 func (c *Context) HTML(code int, html string) {
 	c.SetHeader("Content-Type", "text/html")
 	c.SetStatus(code)
@@ -70,6 +72,7 @@ func (c *Context) HtmlTemplate(code int, name string,data interface{}) {
 }
 
 /*=============================中间件==============================*/
+
 func (c *Context) DoAllNext()  {
 	c.index++
 	n:=len(c.handles)
