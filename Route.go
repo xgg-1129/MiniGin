@@ -7,7 +7,7 @@ type Route struct {
 	handleFunMap map[string]handleFun
 }
 
-func getRoute() *Route{
+func NewRoute() *Route{
 	return &Route{
 		handleFunMap: make(map[string]handleFun),
 		roots: make(map[string]*node),

@@ -5,13 +5,22 @@ import (
 )
 type Engine struct {
 	route *Route
+	*Group
+	Groups []*Group
 }
 
 type handleFun func(c *Context)
 var defaultWeb *Engine
 
 func GetNewWeb()*Engine{
-	return &Engine{route: getRoute()}
+	engine:=&Engine{
+		route: NewRoute(),
+	}
+	engine.Group=&Group{
+		engine: engine,
+	}
+	engine.Groups=[]*Group{engine.Group}
+	return engine
 }
 func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	context:=GetContext(w,req)
@@ -31,8 +40,5 @@ func (e *Engine) addMethod(method string,pattern string,handle handleFun)  {
 func (e *Engine) Run(addr string) error {
 	return http.ListenAndServe(addr, e)
 }
-
-
-
 
 
