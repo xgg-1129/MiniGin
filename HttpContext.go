@@ -50,3 +50,4 @@ func (c *Context) HTML(code int, html string) {
 	c.W.Write([]byte(html))
 }
 
+
